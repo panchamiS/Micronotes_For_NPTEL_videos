@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NPTEL</title>
+
+        <style type="text/css">
+        #notes_div
+        {
+            /*height: 50px; */
+            padding: 0px;
+            width: 500px;
+            background-color: white;
+            opacity: 0.3;
+        }
+
+        #note_title
+        {
+            padding: 1px;
+            margin-top: 0;
+        }
+
+        .container { position:relative; }
+        .container video {
+            position:relative;
+            z-index:0;
+        }
+        .overlay {
+            position:absolute;
+            top:0;
+            left:0;
+            z-index:1;
+        }
+
+        </style>
+        
+        <script type="text/javascript">
+        var count = 0;
+        var index = 0;
+        var timer = 0;
+        /*var raw_micro_notes = '{ "notes": [ {"time":10,"note": "About blender foundation :)","link": "http://www.blender.org","author": "surendra"},{"time":20,"note": "great!!","link": "www.sintel.org","author": "ssk"},{"time":41,"note": "check about sintel","link": "www.sintel.org","author": "ssk"}] }'; 
+        //var micro_notes  = eval ("(" + raw_micro_notes + ")");   */
+        var micro_notes = [];
+
+        function init()
+        {
+        //alert(micro_notes.notes.length);
+        vid = document.getElementById("nptel");
+        load_video();
+        //alert(vid);
+        //vid.onplay = play_pressed;
+        //vid.ontimeupdate = updated; 
+        //vid.onpause = paused;
+        //alert("did");
+        vid.addEventListener("play",play_pressed, false);
+        vid.addEventListener("seeked",seek_end, false);
+        vid.addEventListener("pause",paused, false);
+        vid.addEventListener("timeupdate",updated, false);
+        }
+
+        function load_video()
+        {
+
+            var xmlhttp;
+            if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                //document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                console.log("(" + xmlhttp.responseText + ")");
+                info = eval("(" + xmlhttp.responseText + ")");
+                vid.src = info.video;
+                console.log(info.notes);
+                for(i=0;i<info.notes.length;i++)
+                    load_notes(info.notes[i]);
+                //TODO  make sure you wait untill all notes are loaded 
+                //console.log(micro_notes);
+                }
+              }
+            xmlhttp.open("POST","http://localhost/fp/data/video1.json",true);
+            xmlhttp.send();
+        }
+
+        function load_notes(note_url)
+        {
+            var xmlhttp;
+            if (window.XMLHttpRequest)
+              {// code for IE7+, Firefox, Chrome, Opera, Safari
+              xmlhttp=new XMLHttpRequest();
+              }
+            else
+              {// code for IE6, IE5
+              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+              }
+            xmlhttp.onreadystatechange=function()
+              {
+              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                {
+                //document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                //console.log("Loading :" + xmlhttp.responseText + ")");
+                notes = eval("(" + xmlhttp.responseText + ")");
+                //console.log(notes);
+                //micro_notes.push(notes);
+                for(i=0;i<notes.notes.length;i++)
+                    micro_notes.push(notes.notes[i]);
+                console.log(micro_notes);
+                
+                }
+              }
+            xmlhttp.open("POST",note_url,true);
+            xmlhttp.send();
+
+
+        }
+
+        function play_pressed()
+        {
+            //TODO  make sure you wait untill all notes are loaded 
+        alert("playing");
+
+        }
+
+        function playOrPause()
+        {
+            if(vid.paused)
+            {
+                vid.play();
+            }
+            else
+                vid.pause();
+        }
+
+        function updated()
+        {
+        count++;
+
+        if(timer > 0)
+        {
+            timer--;
+            if(timer == 0)
+            {
+                document.getElementById("notes_div").innerHTML = "";
+            }
+        }
+        /*
+        if(vid.currentTime >= 5 && vid.currentTime <= 5.25)
+            alert("reached 5 seconds");
+
+        if(vid.currentTime >= 15 && vid.currentTime <= 15.25)
+             alert("reached 5 seconds");
+        
+        
+
+        if(micro_notes.notes.length > index)
+            {   
+                if(vid.currentTime >= micro_notes.notes[index].time && vid.currentTime <= micro_notes.notes[index].time+0.25)
+                    {
+                        //alert(micro_notes.notes[index].note);
+                        var notes_div = document.getElementById("notes_div");
+                        var inner = '<h4 id="note_title">'+ micro_notes.notes[index].note +'</h4><a href='+ micro_notes.notes[index].link + '>Click this</a>';
+                        notes_div.innerHTML = inner;   
+                        timer = 30;          
+                        index++;
+                    }
+            }
+
+        
+
+        if(micro_notes.length > index)
+            {   
+                if(vid.currentTime >= micro_notes[index].time && vid.currentTime <= micro_notes[index].time+0.25)
+                    {
+                        //alert(micro_notes.notes[index].note);
+                        var notes_div = document.getElementById("notes_div");
+                        var inner = '<h4 id="note_title">'+ micro_notes[index].note +'</h4><a href='+ micro_notes[index].link + '>Click this</a>';
+                        notes_div.innerHTML = inner;   
+                        timer = 30;          
+                        index++;
+                    }
+            }
+
+        */
+
+        for(index=0;index<micro_notes.length;index++)
+            {   
+                if(vid.currentTime >= micro_notes[index].time && vid.currentTime <= micro_notes[index].time+0.25)
+                    {
+                        //alert(micro_notes.notes[index].note);
+                        var notes_div = document.getElementById("notes_div");
+                        var inner = '<h4 id="note_title">'+ micro_notes[index].note +'</h4><a onclick="vid.pause()" href='+ micro_notes[index].link + ' target="_blank" >Click this</a>';
+                        notes_div.innerHTML = inner;   
+                        timer = 30;          
+                        index++;
+                    }
+            }
+
+
+        }
+
+        function paused()
+        {
+        //alert(count);
+
+        }
+
+        function seek_end()
+        {
+            //alert(vid.currentTime);
+            index = 0;
+            do
+            {
+                if(micro_notes.notes[index].time > vid.currentTime)
+                    break;
+
+                index++;
+
+            }while(micro_notes.notes.length > index)
+        }
+
+        </script>
+    </head>
+
+    <body onload="init()">
+        <div class="container">
+            <video  id="nptel" width="500" controls onclick="playOrPause()">
+                <!-- <source src="../data/sintel.mp4" type="video/mp4"> -->
+                <!-- <source src="movie.ogg" type="video/ogg"> -->
+                Your browser does not support the video tag.
+            </video>
+            <div class="overlay">
+                <div id="notes_div">
+                </div>
+            </div>
+
+        </div>
+
+    </body>
+</html>
+
