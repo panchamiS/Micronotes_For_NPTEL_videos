@@ -13,4 +13,7 @@ function handleLayout(event)
 	video = $("#video");
 	footer_nav_bar = $("#footer_nav_bar");
 	//console.log(WIDTH);
+	
+	//start aligning the layout
+	
 }
